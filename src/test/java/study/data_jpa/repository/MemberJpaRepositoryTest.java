@@ -64,4 +64,78 @@ class MemberJpaRepositoryTest {
         long deletedCount = memberJpaRepository.count();
         assertThat(deletedCount).isEqualTo(0);
     }
+
+    @Test
+    public void findByUsernameAndAgeGreaterThan() {
+        Member member1 = new Member("member1", 10);
+        Member member2 = new Member("member2", 20);
+
+        memberJpaRepository.save(member1);
+        memberJpaRepository.save(member2);
+
+        List<Member> findMember = memberJpaRepository.findByUsernameAndAgeGreaterThan("member2", 15);
+
+        assertThat(findMember.get(0).getUsername()).isEqualTo("member2");
+        assertThat(findMember.get(0).getAge()).isEqualTo(20);
+        assertThat(findMember.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void findByUsername() {
+        Member member1 = new Member("member1", 10);
+        Member member2 = new Member("member2", 20);
+
+        memberJpaRepository.save(member1);
+        memberJpaRepository.save(member2);
+
+        List<Member> findMember = memberJpaRepository.findByUsername("member2");
+
+        assertThat(findMember.get(0)).isEqualTo(member2);
+        assertThat(findMember.get(0).getUsername()).isEqualTo("member2");
+        assertThat(findMember.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void findByPage() {
+        Member member1 = new Member("member1", 10);
+        Member member2 = new Member("member2", 10);
+        Member member3 = new Member("member3", 10);
+        Member member4 = new Member("member4", 10);
+        Member member5 = new Member("member5", 10);
+        Member member6 = new Member("member6", 20);
+        Member member7 = new Member("member7", 20);
+
+        memberJpaRepository.save(member1);
+        memberJpaRepository.save(member2);
+        memberJpaRepository.save(member3);
+        memberJpaRepository.save(member4);
+        memberJpaRepository.save(member5);
+        memberJpaRepository.save(member6);
+        memberJpaRepository.save(member7);
+
+        int age = 10;
+        int offset = 0;
+        int limit = 3;
+
+        List<Member> members = memberJpaRepository.findByAge(age, offset, limit);
+        long totalCount = memberJpaRepository.totalCount(age);
+
+        assertThat(members.size()).isEqualTo(3);
+        assertThat(totalCount).isEqualTo(5);
+    }
+
+    @Test
+    public void bulkAgePlus() {
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 20));
+        memberJpaRepository.save(new Member("member3", 25));
+        memberJpaRepository.save(new Member("member4", 30));
+        memberJpaRepository.save(new Member("member5", 35));
+        memberJpaRepository.save(new Member("member6", 40));
+        memberJpaRepository.save(new Member("member7", 50));
+
+        int result = memberJpaRepository.bulkAgePlus(20);
+
+        assertThat(result).isEqualTo(5);
+    }
 }
