@@ -33,6 +33,9 @@ class MemberRepositoryTest {
     TeamRepository teamRepository;
 
     @Autowired
+    MemberQueryRepository memberQueryRepository;
+
+    @Autowired
     EntityManager em;
 
     @Test
@@ -284,5 +287,71 @@ class MemberRepositoryTest {
         assertThat(memberList.get(0).getAge()).isEqualTo(51);
         System.out.println("memberList.get(0).getAge() = " + memberList.get(0).getAge());
     }
+
+    @Test
+    public void findMemberLazy() {
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 20, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        //List<Member> memberList = memberRepository.findAll();
+        //List<Member> memberList = memberRepository.findMemberFetchJoin();
+        //List<Member> memberList = memberRepository.findMemberEntityGraph();
+        List<Member> memberList = memberRepository.findEntityGraphByUsername("member1");
+        for (Member member : memberList) {
+            System.out.println("member = " + member);
+            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
+            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+        }
+    }
+
+    @Test
+    public void hint() {
+        Member member1 = new Member("member1", 10);
+        Member member2 = new Member("member2", 20);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        //Member findMember = memberRepository.findMemberByUsername("member1");
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member3");
+    }
+
+    @Test
+    public void lock() {
+        Member member1 = new Member("member1", 10);
+        Member member2 = new Member("member2", 20);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        Member findMember = memberRepository.findLockByUsername("member1");
+    }
+
+
+    @Test
+    public void custom() {
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
+
+    @Test
+    public void query() {
+        List<Member> memberQuery = memberQueryRepository.findMemberQuery();
+    }
+
 
 }
