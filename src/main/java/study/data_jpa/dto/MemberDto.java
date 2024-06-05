@@ -1,6 +1,7 @@
 package study.data_jpa.dto;
 
 import lombok.Data;
+import study.data_jpa.entity.Member;
 
 @Data
 public class MemberDto {
@@ -15,5 +16,12 @@ public class MemberDto {
         this.username = username;
         this.age = age;
         this.teamname = teamname;
+    }
+
+    public MemberDto(Member member) {
+        this.id = member.getId();
+        this.username = member.getUsername();
+        this.age = member.getAge();
+        this.teamname = getTeamname();
     }
 }
